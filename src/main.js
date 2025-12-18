@@ -1,21 +1,11 @@
-import { Actor, log, sleep } from "apify";
+import { Actor } from "apify";
 import { CheerioCrawler } from "crawlee";
 
 await Actor.init();
+console.log("Current run ID:", Actor.getEnv().actorRunId);
 
 // Get input
 const input = await Actor.getInput();
-const debugMode = input?.debugMode === true;
-
-// Keep logs lean unless debugging is explicitly turned on
-if (!debugMode) {
-  log.setLevel(log.LEVELS.ERROR);
-}
-
-if (debugMode) {
-  console.log("Current run ID:", Actor.getEnv().actorRunId);
-}
-
 const startUrls = input?.startUrls || [
   { url: "https://www.reddit.com/r/all/" },
 ];
@@ -32,12 +22,13 @@ const time = input?.time || "all";
 const includeNSFW = input?.includeNSFW !== false; // default true
 const maxItems = input?.maxPostCount || 10; // max PostCount
 const maxPostCount = input?.maxPostCount || 10; // max PostCount
-const maxComments = input?.maxCommentsPerPost !== undefined ? input.maxCommentsPerPost : 2;
+const maxComments = input?.maxCommentsPerPost !== undefined ? input.maxCommentsPerPost : 10;
 const maxCommunitiesCount =
   input?.maxCommunitiesCount !== undefined ? input.maxCommunitiesCount : 2;
 const maxUserCount = input?.maxUserCount !== undefined ? input.maxUserCount : 2;
 const postDateLimit = input?.postDateLimit || null;
 const maxPostAgeDays = input?.maxPostAgeDays !== undefined ? input.maxPostAgeDays : null;
+const debugMode = input?.debugMode === true;
 const startPage = input?.startPage || 1;
 const endPage = input?.endPage || null;
 const skipComments = input?.skipComments === true;
@@ -48,35 +39,6 @@ const proxyInput = input?.proxy || {
   apifyProxyGroups: ["RESIDENTIAL"],
 };
 const scrollTimeout = (input?.scrollTimeout || 40) * 1000; // Convert seconds to milliseconds
-
-const userAgents = [
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0",
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
-];
-
-const baseHeaders = {
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "en-US,en;q=0.9",
-  "Accept-Encoding": "gzip, deflate, br",
-  Referer: "https://www.reddit.com/",
-  Origin: "https://www.reddit.com",
-  Connection: "keep-alive",
-};
-
-const pickUserAgent = (session) => {
-  if (session?.userData?.ua) return session.userData.ua;
-  const ua = userAgents[Math.floor(Math.random() * userAgents.length)];
-  if (session) session.userData.ua = ua;
-  return ua;
-};
-
-const shortNavigationPause = () =>
-  sleep(120 + Math.floor(Math.random() * 280));
-
-const blockedStatusCodes = new Set([401, 403, 429, 500, 502, 503, 504, 590]);
 
 // Validate input
 if (!ignoreStartUrls && (!startUrls?.length || !Array.isArray(startUrls))) {
@@ -276,9 +238,7 @@ if (searches && Array.isArray(searches) && searches.length > 0) {
         : searchQuery.query || searchQuery.url;
     if (!query) continue;
 
-    if (debugMode) {
-      console.log(`Search mode activated for query: "${query}"`);
-    }
+    console.log(`Search mode activated for query: "${query}"`);
 
     if (searchPosts) {
       let searchUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(
@@ -295,7 +255,7 @@ if (searches && Array.isArray(searches) && searches.length > 0) {
           query: query,
         },
       });
-      if (debugMode) console.log("Added search posts URL");
+      console.log("Added search posts URL");
     }
 
     if (searchCommunities) {
@@ -310,7 +270,7 @@ if (searches && Array.isArray(searches) && searches.length > 0) {
           query: query,
         },
       });
-      if (debugMode) console.log("Added search communities URL");
+      console.log("Added search communities URL");
     }
 
     if (searchUsers) {
@@ -325,7 +285,7 @@ if (searches && Array.isArray(searches) && searches.length > 0) {
           query: query,
         },
       });
-      if (debugMode) console.log("Added search users URL");
+      console.log("Added search users URL");
     }
 
     if (searchComments) {
@@ -340,7 +300,7 @@ if (searches && Array.isArray(searches) && searches.length > 0) {
           query: query,
         },
       });
-      if (debugMode) console.log("Added search comments URL");
+      console.log("Added search comments URL");
     }
   }
 }
@@ -359,7 +319,7 @@ if (!ignoreStartUrls) {
       const isCommunity = url.includes("/r/") && !isPost;
 
       if (isUser && skipUserPosts) {
-        if (debugMode) console.log(`Skipping user URL: ${url}`);
+        console.log(`Skipping user URL: ${url}`);
         continue;
       }
 
@@ -411,41 +371,28 @@ const crawler = new CheerioCrawler({
   requestQueue,
   maxRequestRetries,
   maxConcurrency,
-  minConcurrency: Math.min(2, maxConcurrency),
-  useSessionPool: true,
-  sessionPoolOptions: {
-    maxPoolSize: Math.max(10, maxConcurrency * 2),
-    sessionOptions: {
-      maxUsageCount: 20,
-      maxErrorScore: 1,
-    },
-  },
-  persistCookiesPerSession: true,
 
   additionalMimeTypes: ["application/json"],
 
   preNavigationHooks: [
-    async ({ request, session }) => {
-      const ua = pickUserAgent(session);
+    async ({ request }) => {
       request.headers = {
-        ...baseHeaders,
-        "User-Agent": ua,
-        "Cache-Control": "no-cache",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        Referer: "https://www.reddit.com/",
+        Origin: "https://www.reddit.com",
       };
-      await shortNavigationPause();
     },
   ],
 
-  requestHandler: async ({ request, json, log, session, response }) => {
+  requestHandler: async ({ request, json, log }) => {
     if (debugMode) {
       log.info(`Processing ${request.url} (Type: ${request.userData.type})`);
-    }
-
-    if (response?.statusCode && response.statusCode >= 400) {
-      if (blockedStatusCodes.has(response.statusCode)) {
-        session?.markBad();
-      }
-      throw new Error(`HTTP ${response.statusCode} for ${request.url}`);
+    } else {
+      log.info(`Processing ${request.url}`);
     }
 
     try {
@@ -496,11 +443,7 @@ const crawler = new CheerioCrawler({
     }
   },
 
-  failedRequestHandler: async ({ request, log, error, session }) => {
-    const errorMessage = error?.message || "";
-    if (session && (blockedStatusCodes.has(error?.statusCode) || errorMessage.includes("403"))) {
-      session.markBad();
-    }
+  failedRequestHandler: async ({ request, log, error }) => {
     log.error(`Request ${request.url} failed after retries: ${error.message}`);
   },
 });
@@ -710,23 +653,19 @@ async function handleComments(json, request, log) {
 
   const extractedComments = flattenComments(comments).slice(0, maxComments); // defensive slice
   const commentCount = extractedComments.length;
-  let pushedComments = 0;
 
   // Then push comments up to the limit
   for (const comment of extractedComments) {
     if (!canPushMoreCommentsItems(postId)) {
-      log.info(`Reached max comments limit for post ${postId}. Stopping comment push.`);
+      log.info(`Reached maxItems limit (${maxItems}). Stopping comment push.`);
       break;
     }
     await Actor.pushData(comment);
     incrementCommentCountLimit(postId);
-    pushedComments++;
   }
 
-  totalCommentsScraped += pushedComments;
-
   log.info(
-    `Extracted ${pushedComments} comments for post: ${postTitle} (Total comments: ${totalCommentsScraped}, Total items: ${totalItemsPushed}/${maxItems})`
+    `Extracted ${commentCount} comments for post: ${postTitle} (Total comments: ${totalCommentsScraped}, Total items: ${totalItemsPushed}/${maxItems})`
   );
 }
 
@@ -1387,19 +1326,12 @@ async function handleSearchComments(json, request, log) {
   }
 
   let commentCount = 0;
-  let pushedComments = 0;
   for (const child of children) {
+    if (!canPushMoreCommentsItems(postInfo.id)) break;
+
     if (child.kind !== "t1") continue;
 
     const comment = child.data;
-    const postInfo = comment?.link_title
-      ? { title: comment.link_title, id: comment.link_id?.replace("t3_", "") }
-      : null;
-    const postKey = postInfo?.id;
-
-    if (postKey && !canPushMoreCommentsItems(postKey)) {
-      continue;
-    }
 
     // Skip deleted or removed comments
     if (
@@ -1411,6 +1343,10 @@ async function handleSearchComments(json, request, log) {
       continue;
     }
 
+    // Extract post info if available
+    const postInfo = comment.link_title
+      ? { title: comment.link_title, id: comment.link_id?.replace("t3_", "") }
+      : null;
     const communityName = comment.subreddit_name_prefixed || null;
 
     const commentData = {
@@ -1446,14 +1382,11 @@ async function handleSearchComments(json, request, log) {
     await Actor.pushData(commentData);
     // totalItemsPushed++;
     commentCount++;
-    pushedComments++;
-    if (postKey) incrementCommentCountLimit(postKey);
+    incrementCommentCountLimit(postInfo.id);
   }
 
-  totalCommentsScraped += pushedComments;
-
   log.info(
-    `Extracted ${pushedComments} comments from search page ${currentPage} (Total: ${totalCommentsScraped})`
+    `Extracted ${commentCount} comments from search page ${currentPage} (Total: ${totalCommentsScraped})`
   );
 
   // Handle pagination for search comments
@@ -1589,12 +1522,34 @@ for (const [postId, post] of postsMap.entries()) {
 }
 
 // Log final statistics
-console.log("\nReddit scraping finished.");
-console.log(
-  `Items stored: ${totalItemsPushed} | Posts: ${totalPostsScraped}/${maxPostCount} | Comments: ${totalCommentsScraped} | Communities: ${totalCommunitiesScraped} | Users: ${totalUsersScraped}`
-);
-console.log(
-  `Config -> posts=${maxPostCount}, commentsPerPost=${maxComments}, sort=${sort}, time=${time}, nsfw=${includeNSFW}, pages=${startPage}-${endPage || "unlimited"}`
-);
+// Pretty / Human-Readable Final Statistics Log
+console.log("\n=====================================================");
+console.log("           🌐 Reddit Scraping Summary Report");
+console.log("=====================================================\n");
+
+// console.log("📊 **Scraping Overview**");
+// console.log("---------------------------------------------");
+// console.log(`• Total Items Scraped   : ${totalItemsPushed}`);
+// console.log(`• Posts Scraped         : ${totalPostsScraped}`);
+// console.log(`• Comments Scraped      : ${totalCommentsScraped}`);
+// console.log(`• Communities Scraped   : ${totalCommunitiesScraped}`);
+// console.log(`• Users Scraped         : ${totalUsersScraped}\n`);
+
+console.log("⚙️ **Configuration Used**");
+console.log("---------------------------------------------");
+console.log(`• Max Post Count        : ${maxPostCount}`);
+console.log(`• Max Comments Per Post : ${maxComments}`);
+console.log(`• Sort Mode             : ${sort}`);
+console.log(`• Time Range            : ${time}`);
+console.log(`• Include NSFW          : ${includeNSFW}`);
+console.log(`• max Post Age Days      : ${maxPostAgeDays}\n`);
+
+console.log("📄 **Pagination Details**");
+console.log("---------------------------------------------");
+console.log(`• Page Range            : ${startPage} → ${endPage || "∞ (unlimited)"}\n`);
+
+console.log("✅ Scraping Completed Successfully!");
+console.log("=====================================================\n");
+
 
 await Actor.exit();
