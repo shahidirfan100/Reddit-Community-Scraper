@@ -6,11 +6,10 @@ await Actor.init();
 // Get input
 const input = await Actor.getInput();
 const debugMode = input?.debugMode === true;
-const logger = Actor.log;
 
 // Keep logs lean unless debugging is explicitly turned on
 if (!debugMode) {
-  logger.setLevel(log.LEVELS.ERROR);
+  log.setLevel(log.LEVELS.ERROR);
 }
 
 if (debugMode) {
