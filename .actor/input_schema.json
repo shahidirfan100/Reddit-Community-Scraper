@@ -1,148 +1,201 @@
 {
-  "title": "Reddit Scraper Input Schema",
+  "title": "Reddit Community Scraper - Input Configuration",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
     "startUrls": {
-      "title": "Start URLs",
+      "title": "🎯 Start URLs",
       "type": "array",
-      "description": "List of Reddit URLs to scrape (subreddits, posts, or user profiles)",
+      "description": "List of Reddit URLs to scrape. Supports subreddits (r/example), user profiles (u/username), or specific posts.",
       "editor": "requestListSources",
       "example": [
         { "url": "https://www.reddit.com/r/programming/" },
-        { "url": "https://www.reddit.com/r/funny/" }
+        { "url": "https://www.reddit.com/r/funny/" },
+        { "url": "https://www.reddit.com/u/someuser/" }
       ],
       "default": [
         { "url": "https://www.reddit.com/r/GrowthHacking/" }
-      ]
+      ],
+      "section": "basic"
     },
     "maxPostCount": {
-      "title": "Max Post Count",
+      "title": "📊 Maximum Posts",
       "type": "integer",
-      "description": "Maximum number of posts to scrape",
+      "description": "Maximum number of posts to scrape across all sources (0-10000).",
       "minimum": 0,
       "maximum": 10000,
-      "default": 4
-    },
-    "ignoreStartUrls": {
-      "title": "Ignore Start URLs",
-      "type": "boolean",
-      "description": "If true, startUrls will be ignored (useful when only using search)",
-      "default": false
-    },
-    "proxy": {
-      "title": "Proxy Configuration",
-      "type": "object",
-      "description": "Proxy settings for the scraper.",
-      "editor": "proxy",
-      "prefill": { "useApifyProxy": true }
-    },
-    "scrollTimeout": {
-      "title": "Scroll Timeout",
-      "type": "integer",
-      "description": "Timeout for scrolling (ms)",
-      "default": 400
-    },
-    "searchComments": {
-      "title": "Search Comments",
-      "type": "boolean",
-      "description": "Search for comments matching the query",
-      "default": false
-    },
-    "searchCommunities": {
-      "title": "Search Communities",
-      "type": "boolean",
-      "description": "Search for communities (subreddits) matching the query",
-      "default": false
-    },
-    "searchPosts": {
-      "title": "Search Posts",
-      "type": "boolean",
-      "description": "Search for posts matching the query",
-      "default": false
-    },
-    "skipComments": {
-      "title": "Skip Comments",
-      "type": "boolean",
-      "description": "Skip scraping comments from posts",
-      "default": false
+      "default": 4,
+      "section": "basic"
     },
     "maxCommentsPerPost": {
-      "title": "Max Comments Per Post",
+      "title": "💬 Comments Per Post",
       "type": "integer",
-      "description": "Maximum number of comments to scrape per post (0 = no comments)",
+      "description": "Maximum number of comments to scrape per post (0-1000). Set to 0 to skip comments entirely.",
       "minimum": 0,
       "maximum": 1000,
-      "default": 2
+      "default": 2,
+      "section": "basic"
     },
-    "sort": {
-      "title": "Sort",
-      "type": "string",
-      "description": "Sort order for posts (e.g. new, hot, top, rising, relevance, best, comments).",
-      "editor": "select",
-      "enum": ["hot", "new", "top", "rising", "relevance", "best", "comments"],
-      "default": "new"
-    },
-    "time": {
-      "title": "Time Filter",
-      "type": "string",
-      "description": "Time filter for sorting (e.g. all, day, week, month, year).",
-      "editor": "select",
-      "enum": ["hour", "day", "week", "month", "year", "all"],
-      "default": "all"
-    },
-    "includeNSFW": {
-      "title": "Include NSFW",
+    "skipComments": {
+      "title": "🚫 Skip Comments",
       "type": "boolean",
-      "description": "Include NSFW (Not Safe For Work) posts",
-      "default": false
-    },
-    "maxPostAgeDays": {
-      "title": "Maximum Post Age (Days)",
-      "type": "integer",
-      "description": "Scrape only posts that were created within the last N days. Leave empty to include posts of any age.",
-      "minimum": 1
-    },
-    "startPage": {
-      "title": "Start Page",
-      "type": "integer",
-      "description": "Page number to start scraping from (1 = first page)",
-      "minimum": 1,
-      "default": 1
-    },
-    "endPage": {
-      "title": "End Page",
-      "type": "integer",
-      "description": "Page number to stop scraping at (leave empty for unlimited)",
-      "minimum": 1
-    },
-    "maxRequestRetries": {
-      "title": "Max Request Retries",
-      "type": "integer",
-      "description": "Maximum number of retries for failed requests",
-      "minimum": 0,
-      "default": 3
-    },
-    "maxConcurrency": {
-      "title": "Max Concurrency",
-      "type": "integer",
-      "description": "Maximum concurrent requests",
-      "minimum": 1,
-      "default": 10
-    },
-    "debugMode": {
-      "title": "Debug Mode",
-      "type": "boolean",
-      "description": "Enable detailed logging for debugging",
-      "default": false
+      "description": "Skip scraping comments from posts to speed up the process.",
+      "default": false,
+      "section": "basic"
     },
     "searchQuery": {
-      "title": "Search Query",
+      "title": "🔍 Search Query",
       "type": "string",
-      "description": "Search term to find posts, communities, or users",
+      "description": "Search term to find posts, communities, or users. Leave empty to use Start URLs only.",
       "editor": "textfield",
-      "default": ""
+      "default": "",
+      "section": "search"
+    },
+    "searchPosts": {
+      "title": "📝 Search Posts",
+      "type": "boolean",
+      "description": "Search for posts matching the query.",
+      "default": false,
+      "section": "search"
+    },
+    "searchCommunities": {
+      "title": "🏠 Search Communities",
+      "type": "boolean",
+      "description": "Search for communities (subreddits) matching the query.",
+      "default": false,
+      "section": "search"
+    },
+    "searchComments": {
+      "title": "💭 Search Comments",
+      "type": "boolean",
+      "description": "Search for comments matching the query.",
+      "default": false,
+      "section": "search"
+    },
+    "ignoreStartUrls": {
+      "title": "🔄 Ignore Start URLs",
+      "type": "boolean",
+      "description": "Ignore Start URLs when using search (useful for pure search-based scraping).",
+      "default": false,
+      "section": "search"
+    },
+    "sort": {
+      "title": "📈 Sort Order",
+      "type": "string",
+      "description": "How to sort posts and search results.",
+      "editor": "select",
+      "enum": ["hot", "new", "top", "rising", "relevance", "best", "comments"],
+      "enumTitles": ["Hot", "New", "Top", "Rising", "Relevance", "Best", "Comments"],
+      "default": "new",
+      "section": "filtering"
+    },
+    "time": {
+      "title": "⏰ Time Filter",
+      "type": "string",
+      "description": "Time range for sorting (only applies to 'top' and 'comments' sort).",
+      "editor": "select",
+      "enum": ["hour", "day", "week", "month", "year", "all"],
+      "enumTitles": ["Past Hour", "Past Day", "Past Week", "Past Month", "Past Year", "All Time"],
+      "default": "all",
+      "section": "filtering"
+    },
+    "includeNSFW": {
+      "title": "🔞 Include NSFW Content",
+      "type": "boolean",
+      "description": "Include NSFW (Not Safe For Work) posts in results.",
+      "default": false,
+      "section": "filtering"
+    },
+    "maxPostAgeDays": {
+      "title": "📅 Maximum Post Age",
+      "type": "integer",
+      "description": "Only scrape posts created within the last N days. Leave empty for no age limit.",
+      "minimum": 1,
+      "section": "filtering"
+    },
+    "startPage": {
+      "title": "📄 Start Page",
+      "type": "integer",
+      "description": "Page number to start scraping from (1 = first page).",
+      "minimum": 1,
+      "default": 1,
+      "section": "pagination"
+    },
+    "endPage": {
+      "title": "📄 End Page",
+      "type": "integer",
+      "description": "Page number to stop scraping at. Leave empty for unlimited pages.",
+      "minimum": 1,
+      "section": "pagination"
+    },
+    "maxConcurrency": {
+      "title": "⚡ Max Concurrency",
+      "type": "integer",
+      "description": "Maximum number of concurrent requests. Higher values are faster but may hit rate limits.",
+      "minimum": 1,
+      "maximum": 50,
+      "default": 10,
+      "section": "performance"
+    },
+    "maxRequestRetries": {
+      "title": "🔄 Max Retries",
+      "type": "integer",
+      "description": "Maximum number of retries for failed requests.",
+      "minimum": 0,
+      "maximum": 10,
+      "default": 3,
+      "section": "performance"
+    },
+    "scrollTimeout": {
+      "title": "⏳ Scroll Timeout",
+      "type": "integer",
+      "description": "Timeout for scrolling operations in milliseconds.",
+      "minimum": 100,
+      "maximum": 10000,
+      "default": 400,
+      "section": "performance"
+    },
+    "debugMode": {
+      "title": "🐛 Debug Mode",
+      "type": "boolean",
+      "description": "Enable detailed logging for debugging and troubleshooting.",
+      "default": false,
+      "section": "performance"
+    },
+    "proxy": {
+      "title": "🌐 Proxy Configuration",
+      "type": "object",
+      "description": "Proxy settings for the scraper. Recommended for high-volume scraping to avoid rate limits.",
+      "editor": "proxy",
+      "prefill": { "useApifyProxy": true },
+      "section": "proxy"
     }
   },
-  "required": []
+  "required": [],
+  "sections": [
+    {
+      "title": "🎯 Basic Configuration",
+      "name": "basic"
+    },
+    {
+      "title": "🔍 Search Configuration",
+      "name": "search"
+    },
+    {
+      "title": "🎛️ Filtering & Sorting",
+      "name": "filtering"
+    },
+    {
+      "title": "📄 Pagination",
+      "name": "pagination"
+    },
+    {
+      "title": "⚙️ Performance & Advanced",
+      "name": "performance"
+    },
+    {
+      "title": "🌐 Proxy Configuration",
+      "name": "proxy"
+    }
+  ]
 }
