@@ -1,0 +1,148 @@
+{
+  "title": "Reddit Scraper Input Schema",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "startUrls": {
+      "title": "Start URLs",
+      "type": "array",
+      "description": "List of Reddit URLs to scrape (subreddits, posts, or user profiles)",
+      "editor": "requestListSources",
+      "example": [
+        { "url": "https://www.reddit.com/r/programming/" },
+        { "url": "https://www.reddit.com/r/funny/" }
+      ],
+      "default": [
+        { "url": "https://www.reddit.com/r/GrowthHacking/" }
+      ]
+    },
+    "maxPostCount": {
+      "title": "Max Post Count",
+      "type": "integer",
+      "description": "Maximum number of posts to scrape",
+      "minimum": 0,
+      "maximum": 10000,
+      "default": 4
+    },
+    "ignoreStartUrls": {
+      "title": "Ignore Start URLs",
+      "type": "boolean",
+      "description": "If true, startUrls will be ignored (useful when only using search)",
+      "default": false
+    },
+    "proxy": {
+      "title": "Proxy Configuration",
+      "type": "object",
+      "description": "Proxy settings for the scraper.",
+      "editor": "proxy",
+      "prefill": { "useApifyProxy": true }
+    },
+    "scrollTimeout": {
+      "title": "Scroll Timeout",
+      "type": "integer",
+      "description": "Timeout for scrolling (ms)",
+      "default": 400
+    },
+    "searchComments": {
+      "title": "Search Comments",
+      "type": "boolean",
+      "description": "Search for comments matching the query",
+      "default": false
+    },
+    "searchCommunities": {
+      "title": "Search Communities",
+      "type": "boolean",
+      "description": "Search for communities (subreddits) matching the query",
+      "default": false
+    },
+    "searchPosts": {
+      "title": "Search Posts",
+      "type": "boolean",
+      "description": "Search for posts matching the query",
+      "default": false
+    },
+    "skipComments": {
+      "title": "Skip Comments",
+      "type": "boolean",
+      "description": "Skip scraping comments from posts",
+      "default": false
+    },
+    "maxCommentsPerPost": {
+      "title": "Max Comments Per Post",
+      "type": "integer",
+      "description": "Maximum number of comments to scrape per post (0 = no comments)",
+      "minimum": 0,
+      "maximum": 1000,
+      "default": 2
+    },
+    "sort": {
+      "title": "Sort",
+      "type": "string",
+      "description": "Sort order for posts (e.g. new, hot, top, rising, relevance, best, comments).",
+      "editor": "select",
+      "enum": ["hot", "new", "top", "rising", "relevance", "best", "comments"],
+      "default": "new"
+    },
+    "time": {
+      "title": "Time Filter",
+      "type": "string",
+      "description": "Time filter for sorting (e.g. all, day, week, month, year).",
+      "editor": "select",
+      "enum": ["hour", "day", "week", "month", "year", "all"],
+      "default": "all"
+    },
+    "includeNSFW": {
+      "title": "Include NSFW",
+      "type": "boolean",
+      "description": "Include NSFW (Not Safe For Work) posts",
+      "default": false
+    },
+    "maxPostAgeDays": {
+      "title": "Maximum Post Age (Days)",
+      "type": "integer",
+      "description": "Scrape only posts that were created within the last N days. Leave empty to include posts of any age.",
+      "minimum": 1
+    },
+    "startPage": {
+      "title": "Start Page",
+      "type": "integer",
+      "description": "Page number to start scraping from (1 = first page)",
+      "minimum": 1,
+      "default": 1
+    },
+    "endPage": {
+      "title": "End Page",
+      "type": "integer",
+      "description": "Page number to stop scraping at (leave empty for unlimited)",
+      "minimum": 1
+    },
+    "maxRequestRetries": {
+      "title": "Max Request Retries",
+      "type": "integer",
+      "description": "Maximum number of retries for failed requests",
+      "minimum": 0,
+      "default": 3
+    },
+    "maxConcurrency": {
+      "title": "Max Concurrency",
+      "type": "integer",
+      "description": "Maximum concurrent requests",
+      "minimum": 1,
+      "default": 10
+    },
+    "debugMode": {
+      "title": "Debug Mode",
+      "type": "boolean",
+      "description": "Enable detailed logging for debugging",
+      "default": false
+    },
+    "searchQuery": {
+      "title": "Search Query",
+      "type": "string",
+      "description": "Search term to find posts, communities, or users",
+      "editor": "textfield",
+      "default": ""
+    }
+  },
+  "required": []
+}

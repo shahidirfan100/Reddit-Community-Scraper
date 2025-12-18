@@ -1,0 +1,183 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "dataType": {
+      "type": "string",
+      "description": "Type of data: 'post', 'comment', or 'community'"
+    },
+    "id": {
+      "type": "string",
+      "description": "Reddit ID of the item"
+    },
+    "parsedId": {
+      "type": "string",
+      "description": "Parsed ID without prefix"
+    },
+    "url": {
+      "type": "string",
+      "description": "URL of the item"
+    },
+    "username": {
+      "type": "string",
+      "description": "Username of the author"
+    },
+    "userId": {
+      "type": "string",
+      "description": "User ID of the author"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of post or community"
+    },
+    "communityName": {
+      "type": "string",
+      "description": "Name of the subreddit (r/subreddit)"
+    },
+    "parsedCommunityName": {
+      "type": "string",
+      "description": "Parsed subreddit name without r/"
+    },
+    "body": {
+      "type": "string",
+      "description": "Text content of post or comment"
+    },
+    "html": {
+      "type": "string",
+      "description": "HTML content"
+    },
+    "link": {
+      "type": "string",
+      "description": "External link URL"
+    },
+    "numberOfComments": {
+      "type": "integer",
+      "description": "Number of comments on a post"
+    },
+    "flair": {
+      "type": "string",
+      "description": "Post flair text"
+    },
+    "upVotes": {
+      "type": "integer",
+      "description": "Number of upvotes"
+    },
+    "upVoteRatio": {
+      "type": "number",
+      "description": "Upvote ratio"
+    },
+    "isVideo": {
+      "type": "boolean",
+      "description": "Whether the post contains video"
+    },
+    "isAd": {
+      "type": "boolean",
+      "description": "Whether the post is an advertisement"
+    },
+    "over18": {
+      "type": "boolean",
+      "description": "Whether content is NSFW"
+    },
+    "thumbnailUrl": {
+      "type": "string",
+      "description": "Thumbnail image URL"
+    },
+    "imageUrls": {
+      "type": "array",
+      "description": "Array of image URLs"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation timestamp"
+    },
+    "scrapedAt": {
+      "type": "string",
+      "description": "Scraping timestamp"
+    },
+    "postId": {
+      "type": "string",
+      "description": "ID of parent post (for comments)"
+    },
+    "parentId": {
+      "type": "string",
+      "description": "ID of parent item"
+    },
+    "numberOfreplies": {
+      "type": "integer",
+      "description": "Number of replies to a comment"
+    },
+    "subscribers": {
+      "type": "integer",
+      "description": "Number of subscribers (for communities)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Community description"
+    },
+    "iconUrl": {
+      "type": "string",
+      "description": "Community icon URL"
+    },
+    "bannerUrl": {
+      "type": "string",
+      "description": "Community banner URL"
+    },
+    "activeUsers": {
+      "type": "integer",
+      "description": "Number of active users"
+    }
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": [
+          "dataType",
+          "title",
+          "username",
+          "communityName",
+          "upVotes",
+          "numberOfComments",
+          "createdAt",
+          "url"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "dataType": {
+            "label": "Type",
+            "format": "text"
+          },
+          "title": {
+            "label": "Title",
+            "format": "text"
+          },
+          "username": {
+            "label": "Author",
+            "format": "text"
+          },
+          "communityName": {
+            "label": "Community",
+            "format": "text"
+          },
+          "upVotes": {
+            "label": "Upvotes",
+            "format": "number"
+          },
+          "numberOfComments": {
+            "label": "Comments",
+            "format": "number"
+          },
+          "createdAt": {
+            "label": "Created",
+            "format": "date"
+          },
+          "url": {
+            "label": "URL",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}

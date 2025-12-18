@@ -1,0 +1,14 @@
+{
+    "actorSpecification": 1,
+    "name": "reddit-community-scraper",
+    "title": "Reddit Community Scraper",
+    "description": "Comprehensive Reddit scraper that extracts posts, comments, communities, and users from Reddit using the JSON API. Perfect for data analysis, research, and monitoring Reddit content.",
+    "version": "0.0",
+    "meta": {
+        "templateId": "js-crawlee-cheerio"
+    },
+    "input": "./input_schema.json",
+    "output": "./output_schema.json",
+    "datasetSchema": "./dataset_schema.json",
+    "dockerfile": "../Dockerfile"
+}

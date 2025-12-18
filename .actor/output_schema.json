@@ -1,0 +1,31 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Reddit Community Scraper Output",
+    "description": "Output schema for Reddit Community Scraper data",
+    "properties": {
+        "overview": {
+            "type": "string",
+            "title": "Overview",
+            "description": "Overview of scraped Reddit data",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        },
+        "posts": {
+            "type": "string",
+            "title": "Posts Data",
+            "description": "Direct link to scraped posts data",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?filter=dataType=post"
+        },
+        "comments": {
+            "type": "string",
+            "title": "Comments Data",
+            "description": "Direct link to scraped comments data",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?filter=dataType=comment"
+        },
+        "communities": {
+            "type": "string",
+            "title": "Communities Data",
+            "description": "Direct link to scraped communities data",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?filter=dataType=community"
+        }
+    }
+}
