@@ -1,4 +1,4 @@
-import { Actor, log } from "apify";
+import { Actor, log, sleep } from "apify";
 import { CheerioCrawler } from "crawlee";
 
 await Actor.init();
@@ -74,7 +74,7 @@ const pickUserAgent = (session) => {
 };
 
 const shortNavigationPause = () =>
-  Actor.sleep(120 + Math.floor(Math.random() * 280));
+  sleep(120 + Math.floor(Math.random() * 280));
 
 const blockedStatusCodes = new Set([401, 403, 429, 500, 502, 503, 504, 590]);
 
